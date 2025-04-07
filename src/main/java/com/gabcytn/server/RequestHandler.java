@@ -1,4 +1,6 @@
-package com.gabcytn;
+package com.gabcytn.server;
+
+import com.gabcytn.http.ResponseBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,8 +37,15 @@ public class RequestHandler implements  Runnable
         {
             readStatusLine();
             readRequestHeaders();
-            String response = HTTP_VERSION + " 200 OK" + CRLF +
-                    "Content-Length: 0" + CRLF + "Connection: close" + CRLF + CRLF;
+            String response = new ResponseBuilder()
+                    .setHttpVersion(HTTP_VERSION)
+                    .setStatusCode(200)
+                    .setStatus("OK")
+                    .setHeader("Content-Length", "5")
+                    .setHeader("Connection", "close")
+                    .setBody("12345")
+                    .build()
+                            .toString();
             socket.getOutputStream().write(response.getBytes(StandardCharsets.UTF_8));
             socket.close();
         }
