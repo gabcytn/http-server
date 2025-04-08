@@ -51,14 +51,6 @@ public class RequestHandler implements  Runnable
         {
             System.err.println("IOException in run() method: " + e.getMessage());
         }
-        finally
-        {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                System.err.println("Error closing socket connection");
-            }
-        }
     }
 
     private String handleEcho ()
