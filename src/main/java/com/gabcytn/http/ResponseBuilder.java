@@ -5,7 +5,6 @@ import java.util.Map;
 
 public class ResponseBuilder
 {
-    private static final String CRLF = "\r\n";
     private final Map<String, String> headers = new HashMap<>();
     private String httpVersion;
     private String status;
