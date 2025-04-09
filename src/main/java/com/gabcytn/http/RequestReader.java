@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public class RequestReader {
     private String body;
 
     public RequestReader (InputStream inputStream) {
-        this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         this.requestHeaders = new HashMap<>();
     }
 
