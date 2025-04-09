@@ -4,6 +4,7 @@ import com.gabcytn.http.RequestReader;
 import com.gabcytn.http.ResponseBuilder;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 
 public class ResponseHandler {
@@ -26,7 +27,7 @@ public class ResponseHandler {
                 .setStatusCode(200)
                 .setStatus("OK")
                 .setHeader("Content-Type", "text/plain")
-                .setHeader("Content-Length", Integer.toString(path.length()))
+                .setHeader("Content-Length", Integer.toString(path.getBytes(StandardCharsets.UTF_8).length))
                 .setHeader("Connection", "close")
                 .setBody(path)
                 .build()
@@ -48,7 +49,7 @@ public class ResponseHandler {
                 .setStatusCode(200)
                 .setStatus("OK")
                 .setHeader("Content-Type", "text/plain")
-                .setHeader("Content-Length", Integer.toString(fileContent.length()))
+                .setHeader("Content-Length", Integer.toString(fileContent.getBytes(StandardCharsets.UTF_8).length))
                 .setHeader("Connection", "close")
                 .setBody(fileContent)
                 .build()
