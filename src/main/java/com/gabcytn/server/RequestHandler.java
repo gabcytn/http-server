@@ -1,7 +1,6 @@
 package com.gabcytn.server;
 
 import com.gabcytn.http.RequestReader;
-import com.gabcytn.http.ResponseBuilder;
 
 import java.io.*;
 import java.net.Socket;
@@ -29,11 +28,23 @@ public class RequestHandler implements  Runnable
         {
             requestReader.read();
             String response;
-            if (requestReader.getRequestPath().startsWith("/echo/"))
+            if (requestReader.getRequestPath().startsWith("/echo/") && "GET".equals(requestReader.getRequestMethod()))
                 response = responseHandler.handleEcho();
             else if (requestReader.getRequestPath().startsWith("/file/"))
-                response = responseHandler.readFile();
-            else if ("/".equals(requestReader.getRequestPath()))
+            {
+                switch (requestReader.getRequestMethod())
+                {
+                    case "GET":
+                        response = responseHandler.readFile();
+                        break;
+                    case "POST":
+                        response = responseHandler.writeFile(requestReader.getBody());
+                        break;
+                    default:
+                        response = responseHandler.generate404();
+                }
+            }
+            else if ("/".equals(requestReader.getRequestPath()) && "GET".equals(requestReader.getRequestMethod()))
                 response = responseHandler.generate200WithoutBody();
             else
                 response = responseHandler.generate404();

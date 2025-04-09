@@ -34,6 +34,32 @@ public class ResponseHandler {
                 .toString();
     }
 
+    public String writeFile (String message)
+    {
+        String[] paths = requestReader.getRequestPath().split("/");
+        if (paths.length != 3)
+            return generate404();
+        String fileName = paths[2];
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILES_DIR + fileName)))
+        {
+            writer.write(message);
+            return new ResponseBuilder()
+                    .setHttpVersion(requestReader.getHttpVersion())
+                    .setStatusCode(201)
+                    .setStatus("Created")
+                    .setHeader("Content-Length", "0")
+                    .setHeader("Connection", "close")
+                    .build()
+                        .toString();
+        }
+        catch (IOException e)
+        {
+            System.err.println("Error writing file: " + e.getMessage());
+            e.printStackTrace();
+            return generate404();
+        }
+    }
+
     public String readFile()
     {
         String[] paths = requestReader.getRequestPath().split("/");
