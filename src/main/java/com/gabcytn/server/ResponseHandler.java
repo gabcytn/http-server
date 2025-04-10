@@ -28,7 +28,7 @@ public class ResponseHandler {
                 .setStatus("OK")
                 .setHeader("Content-Type", "text/plain")
                 .setHeader("Content-Length", Integer.toString(path.getBytes(StandardCharsets.UTF_8).length))
-                .setHeader("Connection", "close")
+                .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "close"))
                 .setBody(path)
                 .build()
                 .toString();
@@ -48,7 +48,7 @@ public class ResponseHandler {
                     .setStatusCode(201)
                     .setStatus("Created")
                     .setHeader("Content-Length", "0")
-                    .setHeader("Connection", "close")
+                    .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "close"))
                     .build()
                         .toString();
         }
@@ -76,7 +76,7 @@ public class ResponseHandler {
                 .setStatus("OK")
                 .setHeader("Content-Type", "text/plain")
                 .setHeader("Content-Length", Integer.toString(fileContent.getBytes(StandardCharsets.UTF_8).length))
-                .setHeader("Connection", "close")
+                .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "close"))
                 .setBody(fileContent)
                 .build()
                 .toString();
@@ -112,7 +112,7 @@ public class ResponseHandler {
                 .setStatusCode(404)
                 .setStatus("Not Found")
                 .setHeader("Content-Length", "0")
-                .setHeader("Connection", "close")
+                .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "close"))
                 .build()
                 .toString();
     }
@@ -125,7 +125,7 @@ public class ResponseHandler {
                 .setStatusCode(200)
                 .setStatus("OK")
                 .setHeader("Content-Length", "0")
-                .setHeader("Connection", "close")
+                .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "close"))
                 .build()
                     .toString();
     }

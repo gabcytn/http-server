@@ -4,6 +4,7 @@ import com.gabcytn.http.RequestReader;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
 public class RequestHandler implements  Runnable
@@ -26,34 +27,53 @@ public class RequestHandler implements  Runnable
     {
         try
         {
-            requestReader.read();
-            String response;
-            if (requestReader.getRequestPath().startsWith("/echo/") && "GET".equals(requestReader.getRequestMethod()))
-                response = responseHandler.handleEcho();
-            else if (requestReader.getRequestPath().startsWith("/file/"))
+            boolean keepAlive = true;
+            while (keepAlive)
             {
-                switch (requestReader.getRequestMethod())
+                // clear previous request's headers
+                requestReader.getRequestHeaders().clear();
+                requestReader.read();
+                if (!requestReader.getHasRequest())
+                    break;
+                String response;
+                if (requestReader.getRequestPath().startsWith("/echo/") && "GET".equals(requestReader.getRequestMethod()))
+                    response = responseHandler.handleEcho();
+                else if (requestReader.getRequestPath().startsWith("/file/"))
                 {
-                    case "GET":
-                        response = responseHandler.readFile();
-                        break;
-                    case "POST":
-                        response = responseHandler.writeFile(requestReader.getBody());
-                        break;
-                    default:
-                        response = responseHandler.generate404();
-                }
+                    switch (requestReader.getRequestMethod()) {
+                        case "GET":
+                            response = responseHandler.readFile();
+                            break;
+                        case "POST":
+                            response = responseHandler.writeFile(requestReader.getBody());
+                            break;
+                        default:
+                            response = responseHandler.generate404();
+                    }
+                } else if ("/".equals(requestReader.getRequestPath()) && "GET".equals(requestReader.getRequestMethod()))
+                    response = responseHandler.generate200WithoutBody();
+                else
+                    response = responseHandler.generate404();
+                socket.getOutputStream().write(response.getBytes(StandardCharsets.UTF_8));
+                keepAlive = "keep-alive".equals(requestReader.getRequestHeaders()
+                                .getOrDefault("connection", "keep-alive"));
             }
-            else if ("/".equals(requestReader.getRequestPath()) && "GET".equals(requestReader.getRequestMethod()))
-                response = responseHandler.generate200WithoutBody();
-            else
-                response = responseHandler.generate404();
-            socket.getOutputStream().write(response.getBytes(StandardCharsets.UTF_8));
-            socket.close();
+        }
+        catch (SocketTimeoutException e)
+        {
+            System.err.println("SOCKET TIMEOUT!!!");
         }
         catch (IOException e)
         {
             System.err.println("IOException in run() method: " + e.getMessage());
+        }
+        finally
+        {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                System.err.println("Failed to close socket: " + e.getMessage());
+            }
         }
     }
 }
