@@ -37,9 +37,8 @@ public class RequestReader {
                 requestHeaders.put(header[0].trim().toLowerCase(), header[1].trim().toLowerCase());
             }
             int contentLength = Integer.parseInt(requestHeaders.getOrDefault("content-length", "0"));
-            if (contentLength == 0)
-                throw new RuntimeException("Content-Length is 0");
-            readBody(contentLength);
+            if (contentLength != 0)
+                readBody(contentLength);
         }
         catch (IOException | RuntimeException e)
         {
