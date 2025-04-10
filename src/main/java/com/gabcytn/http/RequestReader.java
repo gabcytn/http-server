@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,17 +17,19 @@ public class RequestReader {
     private String httpVersion;
     private final Map<String, String> requestHeaders;
     private String body;
+    private Boolean hasRequest = true;
 
     public RequestReader (InputStream inputStream) {
         this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         this.requestHeaders = new HashMap<>();
     }
 
-    public void read ()
+    public void read () throws SocketTimeoutException
     {
         String line;
         try
         {
+            // throws NPE if there's no request to read
             String[] statusLine = bufferedReader.readLine().split(" ");
             this.requestMethod = statusLine[0];
             this.requestPath = statusLine[1];
@@ -40,10 +43,19 @@ public class RequestReader {
             if (contentLength != 0)
                 readBody(contentLength);
         }
+        catch (SocketTimeoutException e)
+        {
+            throw e;
+        }
+        catch (NullPointerException e)
+        {
+            this.hasRequest = false;
+        }
         catch (IOException | RuntimeException e)
         {
             System.err.println("Error while reading request");
             System.err.println("\tMessage: " + e.getMessage());
+            e.printStackTrace();
             this.body = "";
         }
     }
@@ -86,5 +98,9 @@ public class RequestReader {
 
     public String getBody () {
         return body;
+    }
+
+    public Boolean getHasRequest () {
+        return hasRequest;
     }
 }
