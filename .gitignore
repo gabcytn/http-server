@@ -1,4 +1,5 @@
-files/
+files/*
+!files/.gitkeep
 
 target/
 !.mvn/wrapper/maven-wrapper.jar
