@@ -50,7 +50,10 @@ public class RequestHandler implements  Runnable
                         default:
                             response = responseHandler.generate404();
                     }
-                } else if ("/".equals(requestReader.getRequestPath()) && "GET".equals(requestReader.getRequestMethod()))
+                }
+                else if ("/user-agent".equals(requestReader.getRequestPath()) && "GET".equals(requestReader.getRequestMethod()))
+                    response = responseHandler.returnUserAgent();
+                else if ("/".equals(requestReader.getRequestPath()) && "GET".equals(requestReader.getRequestMethod()))
                     response = responseHandler.generate200WithoutBody();
                 else
                     response = responseHandler.generate404();

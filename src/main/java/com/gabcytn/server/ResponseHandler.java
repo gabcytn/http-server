@@ -105,6 +105,20 @@ public class ResponseHandler {
         }
     }
 
+    public String returnUserAgent ()
+    {
+        String userAgent = requestReader.getRequestHeaders().get("user-agent");
+        return new ResponseBuilder()
+                .setHttpVersion(requestReader.getHttpVersion())
+                .setStatusCode(200)
+                .setStatus("OK")
+                .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
+                .setHeader("Content-Length", Integer.toString(userAgent.getBytes(StandardCharsets.UTF_8).length))
+                .setBody(userAgent)
+                .build()
+                    .toString();
+    }
+
     public String generate404 ()
     {
         return new ResponseBuilder()
