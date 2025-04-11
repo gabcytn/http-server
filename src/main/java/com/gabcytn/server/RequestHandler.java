@@ -36,7 +36,9 @@ public class RequestHandler implements  Runnable
                 if (!requestReader.getHasRequest())
                     break;
                 String response;
-                if (requestReader.getRequestPath().startsWith("/echo/") && "GET".equals(requestReader.getRequestMethod()))
+                if (!"HTTP/1.1".equals(requestReader.getHttpVersion()))
+                    response = responseHandler.generate404();
+                else if (requestReader.getRequestPath().startsWith("/echo/") && "GET".equals(requestReader.getRequestMethod()))
                     response = responseHandler.handleEcho();
                 else if (requestReader.getRequestPath().startsWith("/file/"))
                 {
