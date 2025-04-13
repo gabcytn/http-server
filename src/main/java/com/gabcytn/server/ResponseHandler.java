@@ -1,5 +1,6 @@
 package com.gabcytn.server;
 
+import com.gabcytn.http.HttpStatus;
 import com.gabcytn.http.RequestReader;
 import com.gabcytn.http.ResponseBuilder;
 
@@ -24,8 +25,7 @@ public class ResponseHandler {
         String path = paths[2];
         return new ResponseBuilder()
                 .setHttpVersion(requestReader.getHttpVersion())
-                .setStatusCode(200)
-                .setStatus("OK")
+                .setHttpStatus(HttpStatus.OK)
                 .setHeader("Content-Type", "text/plain")
                 .setHeader("Content-Length", Integer.toString(path.getBytes(StandardCharsets.UTF_8).length))
                 .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
@@ -45,8 +45,7 @@ public class ResponseHandler {
             writer.write(message);
             return new ResponseBuilder()
                     .setHttpVersion(requestReader.getHttpVersion())
-                    .setStatusCode(201)
-                    .setStatus("Created")
+                    .setHttpStatus(HttpStatus.CREATED)
                     .setHeader("Content-Length", "0")
                     .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
                     .build()
@@ -72,8 +71,7 @@ public class ResponseHandler {
             return generate404();
         return new ResponseBuilder()
                 .setHttpVersion(requestReader.getHttpVersion())
-                .setStatusCode(200)
-                .setStatus("OK")
+                .setHttpStatus(HttpStatus.OK)
                 .setHeader("Content-Type", "text/plain")
                 .setHeader("Content-Length", Integer.toString(fileContent.getBytes(StandardCharsets.UTF_8).length))
                 .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
@@ -110,8 +108,7 @@ public class ResponseHandler {
         String userAgent = requestReader.getRequestHeaders().get("user-agent");
         return new ResponseBuilder()
                 .setHttpVersion(requestReader.getHttpVersion())
-                .setStatusCode(200)
-                .setStatus("OK")
+                .setHttpStatus(HttpStatus.OK)
                 .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
                 .setHeader("Content-Length", Integer.toString(userAgent.getBytes(StandardCharsets.UTF_8).length))
                 .setBody(userAgent)
@@ -123,8 +120,7 @@ public class ResponseHandler {
     {
         return new ResponseBuilder()
                 .setHttpVersion(requestReader.getHttpVersion())
-                .setStatusCode(404)
-                .setStatus("Not Found")
+                .setHttpStatus(HttpStatus.NOT_FOUND)
                 .setHeader("Content-Length", "0")
                 .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
                 .build()
@@ -136,8 +132,7 @@ public class ResponseHandler {
 
         return new ResponseBuilder()
                 .setHttpVersion(requestReader.getHttpVersion())
-                .setStatusCode(200)
-                .setStatus("OK")
+                .setHttpStatus(HttpStatus.OK)
                 .setHeader("Content-Length", "0")
                 .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
                 .build()

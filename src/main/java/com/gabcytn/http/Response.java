@@ -7,14 +7,12 @@ public class Response
     private static final String CRLF = "\r\n";
     private final Map<String, String> headers;
     private final String httpVersion;
-    private final String status;
-    private final int statusCode;
+    private final HttpStatus httpStatus;
     private final String body;
 
     public Response (ResponseBuilder responseBuilder) {
         this.httpVersion = responseBuilder.getHttpVersion();
-        this.status = responseBuilder.getStatus();
-        this.statusCode = responseBuilder.getStatusCode();
+        this.httpStatus = responseBuilder.getHttpStatus();
         this.headers = responseBuilder.getHeaders();
         this.body = responseBuilder.getBody();
     }
@@ -32,8 +30,8 @@ public class Response
 
     private String getStatusLine () {
         return httpVersion +
-                " " + statusCode +
-                " " + status +
+                " " + httpStatus.getStatusCode() +
+                " " + httpStatus.getStatus() +
                 CRLF;
     }
 

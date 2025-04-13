@@ -7,8 +7,7 @@ public class ResponseBuilder
 {
     private final Map<String, String> headers = new HashMap<>();
     private String httpVersion;
-    private String status;
-    private int statusCode;
+    private HttpStatus httpStatus;
     private String body;
 
     public ResponseBuilder () {}
@@ -18,13 +17,8 @@ public class ResponseBuilder
         return this;
     }
 
-    public ResponseBuilder setStatusCode (int statusCode) {
-        this.statusCode = statusCode;
-        return this;
-    }
-
-    public ResponseBuilder setStatus (String status) {
-        this.status = status;
+    public ResponseBuilder setHttpStatus (HttpStatus httpStatus) {
+        this.httpStatus = httpStatus;
         return this;
     }
 
@@ -38,27 +32,23 @@ public class ResponseBuilder
         return this;
     }
 
-    public Map<String, String> getHeaders() {
+    public Map<String, String> getHeaders () {
         return headers;
     }
 
-    public String getHttpVersion() {
+    public String getHttpVersion () {
         return httpVersion;
     }
 
-    public String getStatus() {
-        return status;
+    public HttpStatus getHttpStatus () {
+        return httpStatus;
     }
 
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public String getBody() {
+    public String getBody () {
         return body;
     }
 
-    public Response build() {
+    public Response build () {
         return new Response(this);
     }
 }
