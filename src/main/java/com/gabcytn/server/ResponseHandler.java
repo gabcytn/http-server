@@ -2,6 +2,7 @@ package com.gabcytn.server;
 
 import com.gabcytn.http.HttpStatus;
 import com.gabcytn.http.RequestReader;
+import com.gabcytn.http.Response;
 import com.gabcytn.http.ResponseBuilder;
 
 import java.io.*;
@@ -16,7 +17,7 @@ public class ResponseHandler {
         this.requestReader = requestReader;
     }
 
-    public String handleEcho ()
+    public Response handleEcho ()
     {
         String[] paths = requestReader.getRequestPath().split("/");
         if (paths.length != 3)
@@ -29,11 +30,10 @@ public class ResponseHandler {
                 .setHeader("Content-Length", Integer.toString(path.getBytes(StandardCharsets.UTF_8).length))
                 .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
                 .setBody(path)
-                .build()
-                .toString();
+                .build();
     }
 
-    public String writeFile (String message)
+    public Response writeFile (String message)
     {
         String[] paths = requestReader.getRequestPath().split("/");
         if (paths.length != 3)
@@ -46,8 +46,7 @@ public class ResponseHandler {
                     .setHttpStatus(HttpStatus.CREATED)
                     .setHeader("Content-Length", "0")
                     .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
-                    .build()
-                        .toString();
+                    .build();
         }
         catch (IOException e)
         {
@@ -57,7 +56,7 @@ public class ResponseHandler {
         }
     }
 
-    public String readFile()
+    public Response readFile()
     {
         String[] paths = requestReader.getRequestPath().split("/");
         if (paths.length != 3)
@@ -73,8 +72,7 @@ public class ResponseHandler {
                 .setHeader("Content-Length", Integer.toString(fileContent.getBytes(StandardCharsets.UTF_8).length))
                 .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
                 .setBody(fileContent)
-                .build()
-                .toString();
+                .build();
     }
 
     private String readFile (String fileName)
@@ -100,7 +98,7 @@ public class ResponseHandler {
         }
     }
 
-    public String returnUserAgent ()
+    public Response returnUserAgent ()
     {
         String userAgent = requestReader.getRequestHeaders().get("user-agent");
         return new ResponseBuilder()
@@ -108,22 +106,19 @@ public class ResponseHandler {
                 .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
                 .setHeader("Content-Length", Integer.toString(userAgent.getBytes(StandardCharsets.UTF_8).length))
                 .setBody(userAgent)
-                .build()
-                    .toString();
+                .build();
     }
 
-    public String generate404 ()
+    public Response generate404 ()
     {
         return new ResponseBuilder()
-                .responseWithoutBody(HttpStatus.NOT_FOUND)
-                    .toString();
+                .responseWithoutBody(HttpStatus.NOT_FOUND);
     }
 
-    public String generate200WithoutBody ()
+    public Response generate200WithoutBody ()
     {
 
         return new ResponseBuilder()
-                .responseWithoutBody(HttpStatus.OK)
-                    .toString();
+                .responseWithoutBody(HttpStatus.OK);
     }
 }

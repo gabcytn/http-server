@@ -2,6 +2,7 @@ package com.gabcytn.server;
 
 import com.gabcytn.http.HttpStatus;
 import com.gabcytn.http.RequestReader;
+import com.gabcytn.http.Response;
 import com.gabcytn.http.ResponseBuilder;
 
 import java.io.*;
@@ -37,7 +38,7 @@ public class RequestHandler implements  Runnable
                 requestReader.read();
                 if (!requestReader.getHasRequest())
                     break;
-                String response;
+                Response response;
                 if (!"HTTP/1.1".equals(requestReader.getHttpVersion()))
                     response = responseHandler.generate404();
                 else if (requestReader.getRequestPath().startsWith("/echo/") && "GET".equals(requestReader.getRequestMethod()))
@@ -61,7 +62,7 @@ public class RequestHandler implements  Runnable
                     response = responseHandler.generate200WithoutBody();
                 else
                     response = responseHandler.generate404();
-                socket.getOutputStream().write(response.getBytes(StandardCharsets.UTF_8));
+                socket.getOutputStream().write(response.toString().getBytes(StandardCharsets.UTF_8));
                 keepAlive = "keep-alive".equals(requestReader.getRequestHeaders()
                                 .getOrDefault("connection", "keep-alive"));
             }
