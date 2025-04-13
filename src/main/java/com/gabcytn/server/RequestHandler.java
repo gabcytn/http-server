@@ -30,8 +30,8 @@ public class RequestHandler implements  Runnable
     {
         try
         {
-            boolean keepAlive = true;
-            while (keepAlive)
+            boolean keepAlive;
+            do
             {
                 // clear previous request's headers
                 requestReader.getRequestHeaders().clear();
@@ -65,7 +65,7 @@ public class RequestHandler implements  Runnable
                 socket.getOutputStream().write(response.toString().getBytes(StandardCharsets.UTF_8));
                 keepAlive = "keep-alive".equals(requestReader.getRequestHeaders()
                                 .getOrDefault("connection", "keep-alive"));
-            }
+            } while (keepAlive);
         }
         catch (SocketTimeoutException e)
         {
