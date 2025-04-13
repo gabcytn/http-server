@@ -31,7 +31,7 @@ public class Response
     private String getStatusLine () {
         return httpVersion +
                 " " + httpStatus.getStatusCode() +
-                " " + httpStatus.getStatus() +
+                " " + httpStatus.getReasonPhrase() +
                 CRLF;
     }
 

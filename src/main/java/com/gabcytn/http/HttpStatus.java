@@ -75,18 +75,18 @@ public enum HttpStatus
     NETWORK_AUTHENTICATION_REQUIRED(511, "Network Authentication Required");
 
     private final Integer statusCode;
-    private final String status;
+    private final String reasonPhrase;
 
     private HttpStatus (Integer statusCode, String status) {
         this.statusCode = statusCode;
-        this.status = status;
+        this.reasonPhrase = status;
     }
 
     public Integer getStatusCode () {
         return statusCode;
     }
 
-    public String getStatus () {
-        return status;
+    public String getReasonPhrase () {
+        return reasonPhrase;
     }
 }
