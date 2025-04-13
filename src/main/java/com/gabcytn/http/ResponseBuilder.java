@@ -5,16 +5,18 @@ import java.util.Map;
 
 public class ResponseBuilder
 {
+    private static final String HTTP_VERSION = "HTTP/1.1";
     private final Map<String, String> headers = new HashMap<>();
-    private String httpVersion;
     private HttpStatus httpStatus;
     private String body;
 
     public ResponseBuilder () {}
 
-    public ResponseBuilder setHttpVersion (String httpVersion) {
-        this.httpVersion = httpVersion;
-        return this;
+    public Response responseWithoutBody (HttpStatus httpStatus) {
+        return this.setHttpStatus(httpStatus)
+                .setHeader("Content-Length", "0")
+                .setHeader("Connection", headers.getOrDefault("connection", "keep-alive"))
+                .build();
     }
 
     public ResponseBuilder setHttpStatus (HttpStatus httpStatus) {
@@ -37,7 +39,7 @@ public class ResponseBuilder
     }
 
     public String getHttpVersion () {
-        return httpVersion;
+        return HTTP_VERSION;
     }
 
     public HttpStatus getHttpStatus () {

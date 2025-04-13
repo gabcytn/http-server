@@ -24,7 +24,6 @@ public class ResponseHandler {
 
         String path = paths[2];
         return new ResponseBuilder()
-                .setHttpVersion(requestReader.getHttpVersion())
                 .setHttpStatus(HttpStatus.OK)
                 .setHeader("Content-Type", "text/plain")
                 .setHeader("Content-Length", Integer.toString(path.getBytes(StandardCharsets.UTF_8).length))
@@ -44,7 +43,6 @@ public class ResponseHandler {
         {
             writer.write(message);
             return new ResponseBuilder()
-                    .setHttpVersion(requestReader.getHttpVersion())
                     .setHttpStatus(HttpStatus.CREATED)
                     .setHeader("Content-Length", "0")
                     .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
@@ -70,7 +68,6 @@ public class ResponseHandler {
         if (fileContent == null)
             return generate404();
         return new ResponseBuilder()
-                .setHttpVersion(requestReader.getHttpVersion())
                 .setHttpStatus(HttpStatus.OK)
                 .setHeader("Content-Type", "text/plain")
                 .setHeader("Content-Length", Integer.toString(fileContent.getBytes(StandardCharsets.UTF_8).length))
@@ -107,7 +104,6 @@ public class ResponseHandler {
     {
         String userAgent = requestReader.getRequestHeaders().get("user-agent");
         return new ResponseBuilder()
-                .setHttpVersion(requestReader.getHttpVersion())
                 .setHttpStatus(HttpStatus.OK)
                 .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
                 .setHeader("Content-Length", Integer.toString(userAgent.getBytes(StandardCharsets.UTF_8).length))
@@ -119,23 +115,15 @@ public class ResponseHandler {
     public String generate404 ()
     {
         return new ResponseBuilder()
-                .setHttpVersion(requestReader.getHttpVersion())
-                .setHttpStatus(HttpStatus.NOT_FOUND)
-                .setHeader("Content-Length", "0")
-                .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
-                .build()
-                .toString();
+                .responseWithoutBody(HttpStatus.NOT_FOUND)
+                    .toString();
     }
 
     public String generate200WithoutBody ()
     {
 
         return new ResponseBuilder()
-                .setHttpVersion(requestReader.getHttpVersion())
-                .setHttpStatus(HttpStatus.OK)
-                .setHeader("Content-Length", "0")
-                .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
-                .build()
+                .responseWithoutBody(HttpStatus.OK)
                     .toString();
     }
 }

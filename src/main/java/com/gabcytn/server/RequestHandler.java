@@ -1,6 +1,8 @@
 package com.gabcytn.server;
 
+import com.gabcytn.http.HttpStatus;
 import com.gabcytn.http.RequestReader;
+import com.gabcytn.http.ResponseBuilder;
 
 import java.io.*;
 import java.net.Socket;
