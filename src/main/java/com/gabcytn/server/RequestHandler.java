@@ -40,7 +40,7 @@ public class RequestHandler implements  Runnable
                     break;
                 Response response;
                 if (!"HTTP/1.1".equals(requestReader.getHttpVersion()))
-                    response = responseHandler.generate404();
+                    response = new ResponseBuilder().responseWithoutBody(HttpStatus.HTTP_VERSION_NOT_SUPPORTED);
                 else if (requestReader.getRequestPath().startsWith("/echo/") && "GET".equals(requestReader.getRequestMethod()))
                     response = responseHandler.handleEcho();
                 else if (requestReader.getRequestPath().startsWith("/file/"))
