@@ -31,6 +31,8 @@ public class RequestReader {
         {
             // throws NPE if there's no request to read
             String[] statusLine = bufferedReader.readLine().split(" ");
+            if (statusLine.length < 3)
+                throw new NullPointerException("No request found");
             this.requestMethod = statusLine[0];
             this.requestPath = statusLine[1];
             this.httpVersion = statusLine[2];
