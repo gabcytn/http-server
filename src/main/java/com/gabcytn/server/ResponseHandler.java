@@ -104,6 +104,7 @@ public class ResponseHandler {
         return new ResponseBuilder()
                 .setHttpStatus(HttpStatus.OK)
                 .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
+                .setHeader("Content-Type", "text/plain")
                 .setHeader("Content-Length", Integer.toString(userAgent.getBytes(StandardCharsets.UTF_8).length))
                 .setBody(userAgent)
                 .build();
