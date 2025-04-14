@@ -15,6 +15,8 @@ import java.util.Map;
 public class AppTest 
     extends TestCase
 {
+    private PrintWriter writer;
+    private BufferedReader reader;
     /**
      * Create the test case
      *
@@ -23,6 +25,15 @@ public class AppTest
     public AppTest( String testName )
     {
         super( testName );
+        try
+        {
+            Socket socket = new Socket("localhost", 8080);
+            this.writer = new PrintWriter(socket.getOutputStream(), true);
+            this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException e)
+        {
+            System.err.println("Error creating socket connection: " + e.getMessage());
+        }
     }
 
     /**
@@ -38,14 +49,9 @@ public class AppTest
      */
     public void testRootEndpoint()
     {
-        try (Socket socket = new Socket("localhost", 8080))
+        try
         {
-            OutputStream outputStream = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(outputStream, true);
             writer.println("GET / HTTP/1.1\r\n\r\n");
-
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             // Read status line
             String response = reader.readLine();
