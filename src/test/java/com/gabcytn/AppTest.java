@@ -76,4 +76,20 @@ public class AppTest
             System.err.println("Error opening socket, " + e.getMessage());
         }
     }
+
+    public void testUnexistingEndpoint () {
+        writer.println("GET /nonexistent HTTP/1.1\r\n\r\n");
+
+        // Read status line
+        String response = null;
+        try
+        {
+            response = reader.readLine();
+        } catch (IOException e)
+        {
+            System.err.println("Error reading status line: " + e.getMessage());
+        }
+        assertNotNull(response);
+        assertEquals("HTTP/1.1 404 Not Found", response);
+    }
 }
