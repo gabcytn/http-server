@@ -92,4 +92,43 @@ public class AppTest
         assertNotNull(response);
         assertEquals("HTTP/1.1 404 Not Found", response);
     }
+
+    public void testUserAgent ()
+    {
+        String userAgent = "java-socket";
+        writer.println("GET /user-agent HTTP/1.1\r\nUser-Agent: " + userAgent + "\r\n\r\n");
+
+        // Read status line
+        String response = null;
+        try
+        {
+            response = reader.readLine();
+        } catch (IOException e)
+        {
+            System.err.println("Error reading status line: " + e.getMessage());
+        }
+        assertNotNull(response);
+
+        // Read headers
+        try
+        {
+            String line;
+            while (!(line = reader.readLine()).isEmpty())
+                continue;
+        } catch (IOException e) {
+            System.err.println("Error reading response headers: " + e.getMessage());
+        }
+
+        // Read body
+        String body = null;
+        try
+        {
+            body = reader.readLine();
+        } catch (IOException e) {
+            System.err.println("Error reading response body: " + e.getMessage());
+        }
+
+        assertNotNull(body);
+        assertEquals(userAgent, body);
+    }
 }
