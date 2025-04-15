@@ -12,6 +12,7 @@ A simple HTTP server built from scratch in Java using `ServerSocket` and `Socket
       - returns **Content-Encoding: gzip** in response header
 - **POST /file/{file_name}**: Writes the body of the POST request to a file in the `/files/` directory. Returns `201 CREATED`.
 - **GET /file/{file_name}**: Reads the contents of the specified file and returns it as the response body with `200 OK`.
+   - also supports **gzip**
 - **404 Not Found**: All other requests return a `404 Not Found` status.
 
 ## Future Features
