@@ -75,12 +75,21 @@ public class ResponseHandler {
         String fileContent = readFile(fileName);
         if (fileContent == null)
             return generate404();
+
+        byte[] body;
+        if (requestReader.getRequestHeaders().getOrDefault("accept-encoding", "").contains("gzip"))
+        {
+            GzipCompressor gzipCompressor = new GzipCompressor();
+            body = gzipCompressor.compress(fileContent);
+        } else {
+            body = fileContent.getBytes(StandardCharsets.UTF_8);
+        }
         return new ResponseBuilder()
                 .setHttpStatus(HttpStatus.OK)
                 .setHeader("Content-Type", "text/plain")
-                .setHeader("Content-Length", Integer.toString(fileContent.getBytes(StandardCharsets.UTF_8).length))
+                .setHeader("Content-Length", Integer.toString(body.length))
                 .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
-                .setBody(fileContent.getBytes(StandardCharsets.UTF_8))
+                .setBody(body)
                 .build();
     }
 
