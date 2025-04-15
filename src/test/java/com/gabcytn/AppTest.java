@@ -112,9 +112,7 @@ public class AppTest
         // Read headers
         try
         {
-            String line;
-            while (!(line = reader.readLine()).isEmpty())
-                continue;
+            while (!(reader.readLine()).isEmpty()) {}
         } catch (IOException e) {
             System.err.println("Error reading response headers: " + e.getMessage());
         }
