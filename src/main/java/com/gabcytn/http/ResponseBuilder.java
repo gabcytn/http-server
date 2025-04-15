@@ -8,9 +8,11 @@ public class ResponseBuilder
     private static final String HTTP_VERSION = "HTTP/1.1";
     private final Map<String, String> headers = new HashMap<>();
     private HttpStatus httpStatus;
-    private String body;
+    private byte[] body;
 
-    public ResponseBuilder () {}
+    public ResponseBuilder () {
+        this.body = new byte[0];
+    }
 
     public Response responseWithoutBody (HttpStatus httpStatus) {
         return this.setHttpStatus(httpStatus)
@@ -29,7 +31,7 @@ public class ResponseBuilder
         return this;
     }
 
-    public ResponseBuilder setBody (String body) {
+    public ResponseBuilder setBody (byte[] body) {
         this.body = body;
         return this;
     }
@@ -46,7 +48,7 @@ public class ResponseBuilder
         return httpStatus;
     }
 
-    public String getBody () {
+    public byte[] getBody () {
         return body;
     }
 

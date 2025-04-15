@@ -8,7 +8,7 @@ public class Response
     private final Map<String, String> headers;
     private final String httpVersion;
     private final HttpStatus httpStatus;
-    private final String body;
+    private final byte[] body;
 
     public Response (ResponseBuilder responseBuilder) {
         this.httpVersion = responseBuilder.getHttpVersion();
@@ -19,11 +19,6 @@ public class Response
 
     @Override
     public String toString () {
-        if (body != null) {
-            return getStatusLine() +
-                    getHeaders() +
-                    body;
-        }
         return getStatusLine() +
                 getHeaders();
     }
@@ -45,5 +40,9 @@ public class Response
         }
         sb.append(CRLF);
         return sb.toString();
+    }
+
+    public byte[] getBody () {
+        return body;
     }
 }

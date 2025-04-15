@@ -1,9 +1,6 @@
 package com.gabcytn.server;
 
-import com.gabcytn.http.HttpStatus;
-import com.gabcytn.http.RequestReader;
-import com.gabcytn.http.Response;
-import com.gabcytn.http.ResponseBuilder;
+import com.gabcytn.http.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -23,13 +20,25 @@ public class ResponseHandler {
         if (paths.length != 3)
             return generate404();
 
-        String path = paths[2];
-        return new ResponseBuilder()
+        String stringedBody = paths[2];
+        ResponseBuilder responseBuilder = new ResponseBuilder()
                 .setHttpStatus(HttpStatus.OK)
                 .setHeader("Content-Type", "text/plain")
-                .setHeader("Content-Length", Integer.toString(path.getBytes(StandardCharsets.UTF_8).length))
-                .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
-                .setBody(path)
+                .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"));
+
+        String acceptEncoding = requestReader.getRequestHeaders().getOrDefault("accept-encoding", "");
+        byte[] body;
+        if (acceptEncoding.contains("gzip"))
+        {
+            GzipCompressor gzipCompressor = new GzipCompressor();
+            body = gzipCompressor.compress(stringedBody);
+            responseBuilder.setHeader("Content-Encoding", "gzip");
+        }
+        else
+            body = stringedBody.getBytes(StandardCharsets.UTF_8);
+
+        return responseBuilder.setHeader("Content-Length", Integer.toString(body.length))
+                .setBody(body)
                 .build();
     }
 
@@ -71,7 +80,7 @@ public class ResponseHandler {
                 .setHeader("Content-Type", "text/plain")
                 .setHeader("Content-Length", Integer.toString(fileContent.getBytes(StandardCharsets.UTF_8).length))
                 .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
-                .setBody(fileContent)
+                .setBody(fileContent.getBytes(StandardCharsets.UTF_8))
                 .build();
     }
 
@@ -106,7 +115,7 @@ public class ResponseHandler {
                 .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
                 .setHeader("Content-Type", "text/plain")
                 .setHeader("Content-Length", Integer.toString(userAgent.getBytes(StandardCharsets.UTF_8).length))
-                .setBody(userAgent)
+                .setBody(userAgent.getBytes(StandardCharsets.UTF_8))
                 .build();
     }
 

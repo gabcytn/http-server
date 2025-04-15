@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 public class RequestHandler implements  Runnable
 {
     private final Socket socket;
+    private final OutputStream outputStream;
     private final RequestReader requestReader;
     private final ResponseHandler responseHandler;
 
@@ -21,6 +22,7 @@ public class RequestHandler implements  Runnable
         this.socket = socket;
         this.socket.setSoTimeout(5000);
         this.socket.setReuseAddress(true);
+        this.outputStream = socket.getOutputStream();
         this.requestReader = new RequestReader(socket.getInputStream());
         this.responseHandler = new ResponseHandler(requestReader);
     }
@@ -62,7 +64,11 @@ public class RequestHandler implements  Runnable
                     response = responseHandler.generate200WithoutBody();
                 else
                     response = responseHandler.generate404();
-                socket.getOutputStream().write(response.toString().getBytes(StandardCharsets.UTF_8));
+
+                outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
+                if (response.getBody().length != 0)
+                    outputStream.write(response.getBody());
+
                 keepAlive = "keep-alive".equals(requestReader.getRequestHeaders()
                                 .getOrDefault("connection", "keep-alive"));
             } while (keepAlive);
