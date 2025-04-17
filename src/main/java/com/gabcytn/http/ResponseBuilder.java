@@ -14,13 +14,6 @@ public class ResponseBuilder
         this.body = new byte[0];
     }
 
-    public Response responseWithoutBody (HttpStatus httpStatus) {
-        return this.setHttpStatus(httpStatus)
-                .setHeader("Content-Length", "0")
-                .setHeader("Connection", headers.getOrDefault("connection", "keep-alive"))
-                .build();
-    }
-
     public ResponseBuilder setHttpStatus (HttpStatus httpStatus) {
         this.httpStatus = httpStatus;
         return this;

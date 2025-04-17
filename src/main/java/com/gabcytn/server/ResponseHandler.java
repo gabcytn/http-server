@@ -135,13 +135,18 @@ public class ResponseHandler {
     public Response generate404 ()
     {
         return new ResponseBuilder()
-                .responseWithoutBody(HttpStatus.NOT_FOUND);
+                .setHttpStatus(HttpStatus.NOT_FOUND)
+                .setHeader("Content-Length", "0")
+                .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
+                .build();
     }
 
     public Response generate200WithoutBody ()
     {
-
         return new ResponseBuilder()
-                .responseWithoutBody(HttpStatus.OK);
+                .setHttpStatus(HttpStatus.OK)
+                .setHeader("Content-Length", "0")
+                .setHeader("Connection", requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
+                .build();
     }
 }

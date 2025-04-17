@@ -42,7 +42,11 @@ public class RequestHandler implements  Runnable
                     break;
                 Response response;
                 if (!"HTTP/1.1".equals(requestReader.getHttpVersion()))
-                    response = new ResponseBuilder().responseWithoutBody(HttpStatus.HTTP_VERSION_NOT_SUPPORTED);
+                    response = new ResponseBuilder()
+                            .setHttpStatus(HttpStatus.HTTP_VERSION_NOT_SUPPORTED)
+                            .setHeader("Content-Length", "0")
+                            .setHeader("Connection", "close")
+                            .build();
                 else if (requestReader.getRequestPath().startsWith("/echo/") && "GET".equals(requestReader.getRequestMethod()))
                     response = responseHandler.handleEcho();
                 else if (requestReader.getRequestPath().startsWith("/file/"))
