@@ -13,6 +13,7 @@ A simple HTTP server built from scratch in Java using `ServerSocket` and `Socket
 - **POST /file/{file_name}**: Writes the body of the POST request to a file in the `/files/` directory. Returns `201 CREATED`.
 - **GET /file/{file_name}**: Reads the contents of the specified file and returns it as the response body with `200 OK`.
    - also supports **gzip**
+- **505 HTTP Version Not Supported**: If the HTTP version is not `HTTP/1.1`
 - **404 Not Found**: All other requests return a `404 Not Found` status.
 
 ## Future Features
@@ -25,8 +26,11 @@ A simple HTTP server built from scratch in Java using `ServerSocket` and `Socket
    ```bash
    git clone https://github.com/gabcytn/http-server.git
    cd http-server
-2. Run the server in IntelliJ
-3. The server will start on port 8080. You can test it with curl or Postman.
+2. Compile and run
+   ```bash
+   mvn compile
+   java -cp ./target/classes com.gabcytn.App
+4. The server will start on port 8080. Test it with cURL or Postman.
 
 ---
 Inspired from: [CodeCrafters](https://codecrafters.io/)
