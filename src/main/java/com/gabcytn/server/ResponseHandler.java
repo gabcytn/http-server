@@ -1,5 +1,6 @@
 package com.gabcytn.server;
 
+import com.gabcytn.App;
 import com.gabcytn.http.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -119,6 +120,28 @@ public class ResponseHandler {
             "Content-Length", Integer.toString(userAgent.getBytes(StandardCharsets.UTF_8).length))
         .setBody(userAgent.getBytes(StandardCharsets.UTF_8))
         .build();
+  }
+
+  public Response registerUser() {
+    try {
+      String reqBody = requestReader.getBody();
+      String[] json = reqBody.split(",");
+      if (json.length != 2) throw new Exception("Incorrect JSON format");
+      json[0] = json[0].trim().toLowerCase().replaceAll("[{},\", ,\t,\n]", "");
+      json[1] = json[1].trim().toLowerCase().replaceAll("[{},\", ,\t,\n]", "");
+      System.err.println("json[0]: " + json[0]);
+      System.err.println("json[1]: " + json[1]);
+      if (json[0].startsWith("username:") && json[1].startsWith("password:")) {
+        String username = json[0].split(":")[1];
+        String password = json[1].split(":")[1];
+        App.createUser(username, password);
+        return responseWithoutBody(HttpStatus.CREATED);
+      }
+      throw new Exception("Incorrect JSON format");
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+      return responseWithoutBody(HttpStatus.BAD_REQUEST);
+    }
   }
 
   public Response responseWithoutBody(HttpStatus httpStatus) {

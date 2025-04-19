@@ -18,6 +18,8 @@ public class PostHandler {
       throw new Error("This is not a POST request");
     } else if (requestReader.getRequestPath().startsWith("/file/")) {
       return responseHandler.writeFile(requestReader.getBody());
+    } else if ("/register".equals(requestReader.getRequestPath())) {
+      return responseHandler.registerUser();
     } else {
       return responseHandler.responseWithoutBody(HttpStatus.NOT_FOUND);
     }
