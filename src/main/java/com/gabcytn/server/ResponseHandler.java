@@ -134,7 +134,8 @@ public class ResponseHandler {
       if (json[0].startsWith("username:") && json[1].startsWith("password:")) {
         String username = json[0].split(":")[1];
         String password = json[1].split(":")[1];
-        App.createUser(username, password);
+        boolean successful = App.createUser(username, password);
+        if (!successful) throw new Exception("User already exists");
         return responseWithoutBody(HttpStatus.CREATED);
       }
       throw new Exception("Incorrect JSON format");

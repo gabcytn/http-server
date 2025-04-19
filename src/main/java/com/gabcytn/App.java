@@ -27,7 +27,10 @@ public class App {
     }
   }
 
-  public static synchronized void createUser(String username, String password) {
+  public static synchronized Boolean createUser(String username, String password) {
+    if (USERS.containsKey(username)) return false;
+
     USERS.put(username, password);
+    return true;
   }
 }
