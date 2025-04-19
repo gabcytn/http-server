@@ -30,10 +30,14 @@ public class RequestReader {
     try {
       // throws NPE if there's no request to read
       String[] statusLine = bufferedReader.readLine().split(" ");
-      if (statusLine.length < 3) throw new NullPointerException("No request found");
+      if (statusLine.length < 3) {
+        throw new NullPointerException("No request found");
+      }
       this.requestMethod = statusLine[0];
       this.requestPath = statusLine[1];
       this.httpVersion = statusLine[2];
+
+      // Read headers
       while (!(line = bufferedReader.readLine()).isEmpty()) {
         String[] header = line.split(":");
         requestHeaders.put(header[0].trim().toLowerCase(), header[1].trim().toLowerCase());
@@ -48,7 +52,6 @@ public class RequestReader {
       System.err.println("Error while reading request");
       System.err.println("\tMessage: " + e.getMessage());
       e.printStackTrace();
-      this.body = "";
     }
   }
 

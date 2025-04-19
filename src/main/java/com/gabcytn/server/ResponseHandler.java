@@ -93,12 +93,15 @@ public class ResponseHandler {
       StringBuilder stringBuilder = new StringBuilder();
       String line = reader.readLine();
       stringBuilder.append(line);
-      while ((line = reader.readLine()) != null) stringBuilder.append("\n").append(line);
+      while ((line = reader.readLine()) != null) {
+        stringBuilder.append("\n").append(line);
+      }
+      reader.close();
       return stringBuilder.toString();
     } catch (IOException e) {
       System.err.println("File not found: " + e.getMessage());
       e.printStackTrace();
-      return null;
+      return "";
     }
   }
 
@@ -116,19 +119,13 @@ public class ResponseHandler {
         .build();
   }
 
-  public Response generate404() {
-    return new ResponseBuilder()
-        .setHttpStatus(HttpStatus.NOT_FOUND)
-        .setHeader("Content-Length", "0")
-        .setHeader(
-            "Connection",
-            requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
-        .build();
+  private Response generate404() {
+    return responseWithoutBody(HttpStatus.NOT_FOUND);
   }
 
-  public Response generate200WithoutBody() {
+  public Response responseWithoutBody(HttpStatus httpStatus) {
     return new ResponseBuilder()
-        .setHttpStatus(HttpStatus.OK)
+        .setHttpStatus(httpStatus)
         .setHeader("Content-Length", "0")
         .setHeader(
             "Connection",
