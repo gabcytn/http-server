@@ -14,7 +14,7 @@ public class ResponseHandler {
 
   public Response handleEcho() {
     String[] paths = requestReader.getRequestPath().split("/");
-    if (paths.length != 3) return generate404();
+    if (paths.length != 3) return responseWithoutBody(HttpStatus.NOT_FOUND);
 
     String stringedBody = paths[2];
     ResponseBuilder responseBuilder =
@@ -41,7 +41,7 @@ public class ResponseHandler {
 
   public Response writeFile(String message) {
     String[] paths = requestReader.getRequestPath().split("/");
-    if (paths.length != 3) return generate404();
+    if (paths.length != 3) return responseWithoutBody(HttpStatus.NOT_FOUND);
     String fileName = paths[2];
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILES_DIR + fileName))) {
       writer.write(message);
@@ -55,22 +55,24 @@ public class ResponseHandler {
     } catch (IOException e) {
       System.err.println("Error writing file: " + e.getMessage());
       e.printStackTrace();
-      return generate404();
+      return responseWithoutBody(HttpStatus.NOT_FOUND);
     }
   }
 
   public Response readFile() {
     String[] paths = requestReader.getRequestPath().split("/");
-    if (paths.length != 3) return generate404();
+    if (paths.length != 3) return responseWithoutBody(HttpStatus.NOT_FOUND);
 
     String fileName = paths[2];
     String fileContent = readFile(fileName);
-    if (fileContent == null) return generate404();
+    if (fileContent == null) return responseWithoutBody(HttpStatus.NOT_FOUND);
 
     ResponseBuilder builder =
         new ResponseBuilder()
             .setHttpStatus(HttpStatus.OK)
-            .setHeader("Content-Type", "text/plain")
+            .setHeader(
+                "Content-Type",
+                requestReader.getRequestHeaders().getOrDefault("accept", "text/plain"))
             .setHeader(
                 "Connection",
                 requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"));
@@ -117,10 +119,6 @@ public class ResponseHandler {
             "Content-Length", Integer.toString(userAgent.getBytes(StandardCharsets.UTF_8).length))
         .setBody(userAgent.getBytes(StandardCharsets.UTF_8))
         .build();
-  }
-
-  private Response generate404() {
-    return responseWithoutBody(HttpStatus.NOT_FOUND);
   }
 
   public Response responseWithoutBody(HttpStatus httpStatus) {
