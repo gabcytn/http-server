@@ -101,7 +101,7 @@ public class ResponseHandler {
     } catch (IOException e) {
       System.err.println("File not found: " + e.getMessage());
       e.printStackTrace();
-      return "";
+      return null;
     }
   }
 
