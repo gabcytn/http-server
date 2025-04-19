@@ -26,6 +26,8 @@ public class GetHandler {
       return responseHandler.readFile();
     } else if ("/user-agent".equals(requestPath)) {
       return responseHandler.returnUserAgent();
+    } else if ("/basic".equals(requestPath)) {
+      return responseHandler.httpBasic();
     } else if ("/".equals(requestPath)) {
       return responseHandler.responseWithoutBody(HttpStatus.OK);
     } else {

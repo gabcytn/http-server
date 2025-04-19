@@ -5,6 +5,7 @@ import com.gabcytn.exception.DuplicateUsernameException;
 import com.gabcytn.http.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class ResponseHandler {
   private final RequestReader requestReader;
@@ -152,6 +153,35 @@ public class ResponseHandler {
       System.err.println(e.getMessage());
       return responseWithoutBody(HttpStatus.BAD_REQUEST);
     }
+  }
+
+  public Response httpBasic() {
+    String authorizationHeader =
+        requestReader.getRequestHeaders().getOrDefault("authorization", "");
+    if (authorizationHeader.isEmpty() || !authorizationHeader.startsWith("Basic ")) {
+      return responseWithoutBody(HttpStatus.UNAUTHORIZED);
+    }
+
+    String encryptedVal = authorizationHeader.split(" ")[1];
+    String decryptedVal = new String(Base64.getDecoder().decode(encryptedVal));
+    String[] credentials = decryptedVal.split(":");
+    String username = credentials[0];
+    String password = credentials[1];
+
+    String message = "HTTP Basic authentication successful!";
+
+    if (!App.login(username, password)) return responseWithoutBody(HttpStatus.UNAUTHORIZED);
+
+    return new ResponseBuilder()
+        .setHttpStatus(HttpStatus.OK)
+        .setHeader(
+            "Connection",
+            requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
+        .setHeader("Content-Length", Integer.toString(message.length()))
+        .setHeader(
+            "Content-Type", requestReader.getRequestHeaders().getOrDefault("accept", "text/plain"))
+        .setBody(message.getBytes())
+        .build();
   }
 
   public Response responseWithoutBody(HttpStatus httpStatus) {

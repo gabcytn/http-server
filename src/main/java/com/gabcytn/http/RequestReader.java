@@ -40,7 +40,14 @@ public class RequestReader {
       // Read headers
       while (!(line = bufferedReader.readLine()).isEmpty()) {
         String[] header = line.split(":");
-        requestHeaders.put(header[0].trim().toLowerCase(), header[1].trim().toLowerCase());
+        String key = header[0].trim().toLowerCase();
+        String value = header[1].trim();
+
+        if ("authorization".equals(key)) {
+          requestHeaders.put(key, value);
+          continue;
+        }
+        requestHeaders.put(key, value.toLowerCase());
       }
       int contentLength = Integer.parseInt(requestHeaders.getOrDefault("content-length", "0"));
       if (contentLength != 0) readBody(contentLength);

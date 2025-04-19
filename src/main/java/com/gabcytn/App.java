@@ -33,4 +33,8 @@ public class App {
     USERS.put(username, password);
     return true;
   }
+
+  public static synchronized Boolean login(String username, String password) {
+    return password.equals(USERS.getOrDefault(username, ""));
+  }
 }
