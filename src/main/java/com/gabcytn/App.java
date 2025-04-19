@@ -4,10 +4,14 @@ import com.gabcytn.server.RequestHandler;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class App {
+  private static final Map<String, String> USERS = new HashMap<>();
+
   public static void main(String[] args) throws IOException {
     ServerSocket serverSocket = new ServerSocket(8080);
     ExecutorService executorService = Executors.newFixedThreadPool(10);
@@ -21,5 +25,16 @@ public class App {
         System.err.println("IOException: " + e.getMessage());
       }
     }
+  }
+
+  public static synchronized Boolean createUser(String username, String password) {
+    if (USERS.containsKey(username)) return false;
+
+    USERS.put(username, password);
+    return true;
+  }
+
+  public static synchronized Boolean login(String username, String password) {
+    return password.equals(USERS.getOrDefault(username, ""));
   }
 }

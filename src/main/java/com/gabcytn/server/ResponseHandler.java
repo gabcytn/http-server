@@ -1,8 +1,11 @@
 package com.gabcytn.server;
 
+import com.gabcytn.App;
+import com.gabcytn.exception.DuplicateUsernameException;
 import com.gabcytn.http.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class ResponseHandler {
   private final RequestReader requestReader;
@@ -14,7 +17,7 @@ public class ResponseHandler {
 
   public Response handleEcho() {
     String[] paths = requestReader.getRequestPath().split("/");
-    if (paths.length != 3) return generate404();
+    if (paths.length != 3) return responseWithoutBody(HttpStatus.NOT_FOUND);
 
     String stringedBody = paths[2];
     ResponseBuilder responseBuilder =
@@ -41,7 +44,7 @@ public class ResponseHandler {
 
   public Response writeFile(String message) {
     String[] paths = requestReader.getRequestPath().split("/");
-    if (paths.length != 3) return generate404();
+    if (paths.length != 3) return responseWithoutBody(HttpStatus.NOT_FOUND);
     String fileName = paths[2];
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILES_DIR + fileName))) {
       writer.write(message);
@@ -55,22 +58,24 @@ public class ResponseHandler {
     } catch (IOException e) {
       System.err.println("Error writing file: " + e.getMessage());
       e.printStackTrace();
-      return generate404();
+      return responseWithoutBody(HttpStatus.NOT_FOUND);
     }
   }
 
   public Response readFile() {
     String[] paths = requestReader.getRequestPath().split("/");
-    if (paths.length != 3) return generate404();
+    if (paths.length != 3) return responseWithoutBody(HttpStatus.NOT_FOUND);
 
     String fileName = paths[2];
     String fileContent = readFile(fileName);
-    if (fileContent == null) return generate404();
+    if (fileContent == null) return responseWithoutBody(HttpStatus.NOT_FOUND);
 
     ResponseBuilder builder =
         new ResponseBuilder()
             .setHttpStatus(HttpStatus.OK)
-            .setHeader("Content-Type", "text/plain")
+            .setHeader(
+                "Content-Type",
+                requestReader.getRequestHeaders().getOrDefault("accept", "text/plain"))
             .setHeader(
                 "Connection",
                 requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"));
@@ -93,7 +98,10 @@ public class ResponseHandler {
       StringBuilder stringBuilder = new StringBuilder();
       String line = reader.readLine();
       stringBuilder.append(line);
-      while ((line = reader.readLine()) != null) stringBuilder.append("\n").append(line);
+      while ((line = reader.readLine()) != null) {
+        stringBuilder.append("\n").append(line);
+      }
+      reader.close();
       return stringBuilder.toString();
     } catch (IOException e) {
       System.err.println("File not found: " + e.getMessage());
@@ -116,19 +124,69 @@ public class ResponseHandler {
         .build();
   }
 
-  public Response generate404() {
+  public Response registerUser() {
+    try {
+      String reqBody = requestReader.getBody();
+      String[] json = reqBody.split(",");
+      if (json.length != 2) throw new Exception("Incorrect JSON format");
+      json[0] = json[0].trim().toLowerCase().replaceAll("[{},\", ,\t,\n]", "");
+      json[1] = json[1].trim().toLowerCase().replaceAll("[{},\", ,\t,\n]", "");
+      if (json[0].startsWith("username:") && json[1].startsWith("password:")) {
+        String username = json[0].split(":")[1];
+        String password = json[1].split(":")[1];
+        boolean successful = App.createUser(username, password);
+        if (!successful) throw new DuplicateUsernameException("User already exists");
+        return responseWithoutBody(HttpStatus.CREATED);
+      }
+      throw new Exception("Incorrect JSON format");
+    } catch (DuplicateUsernameException e) {
+      return new ResponseBuilder()
+          .setHttpStatus(HttpStatus.BAD_REQUEST)
+          .setHeader("Content-Length", Integer.toString(e.getMessage().length()))
+          .setHeader(
+              "Connection",
+              requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
+          .setHeader("Content-Type", "text/plain")
+          .setBody(e.getMessage().getBytes(StandardCharsets.UTF_8))
+          .build();
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+      return responseWithoutBody(HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  public Response httpBasic() {
+    String authorizationHeader =
+        requestReader.getRequestHeaders().getOrDefault("authorization", "");
+    if (authorizationHeader.isEmpty() || !authorizationHeader.startsWith("Basic ")) {
+      return responseWithoutBody(HttpStatus.UNAUTHORIZED);
+    }
+
+    String encryptedVal = authorizationHeader.split(" ")[1];
+    String decryptedVal = new String(Base64.getDecoder().decode(encryptedVal));
+    String[] credentials = decryptedVal.split(":");
+    String username = credentials[0];
+    String password = credentials[1];
+
+    String message = "HTTP Basic authentication successful!";
+
+    if (!App.login(username, password)) return responseWithoutBody(HttpStatus.UNAUTHORIZED);
+
     return new ResponseBuilder()
-        .setHttpStatus(HttpStatus.NOT_FOUND)
-        .setHeader("Content-Length", "0")
+        .setHttpStatus(HttpStatus.OK)
         .setHeader(
             "Connection",
             requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
+        .setHeader("Content-Length", Integer.toString(message.length()))
+        .setHeader(
+            "Content-Type", requestReader.getRequestHeaders().getOrDefault("accept", "text/plain"))
+        .setBody(message.getBytes())
         .build();
   }
 
-  public Response generate200WithoutBody() {
+  public Response responseWithoutBody(HttpStatus httpStatus) {
     return new ResponseBuilder()
-        .setHttpStatus(HttpStatus.OK)
+        .setHttpStatus(httpStatus)
         .setHeader("Content-Length", "0")
         .setHeader(
             "Connection",

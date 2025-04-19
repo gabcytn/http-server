@@ -3,7 +3,6 @@ package com.gabcytn.server;
 import com.gabcytn.http.HttpStatus;
 import com.gabcytn.http.RequestReader;
 import com.gabcytn.http.Response;
-import com.gabcytn.http.ResponseBuilder;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -29,46 +28,34 @@ public class RequestHandler implements Runnable {
     try {
       boolean keepAlive;
       do {
-        // clear previous request's headers
-        requestReader.getRequestHeaders().clear();
         requestReader.read();
+        // break if there's no request to read;
         if (!requestReader.getHasRequest()) break;
         Response response;
         if (!"HTTP/1.1".equals(requestReader.getHttpVersion()))
-          response =
-              new ResponseBuilder()
-                  .setHttpStatus(HttpStatus.HTTP_VERSION_NOT_SUPPORTED)
-                  .setHeader("Content-Length", "0")
-                  .setHeader("Connection", "close")
-                  .build();
-        else if (requestReader.getRequestPath().startsWith("/echo/")
-            && "GET".equals(requestReader.getRequestMethod()))
-          response = responseHandler.handleEcho();
-        else if (requestReader.getRequestPath().startsWith("/file/")) {
-          switch (requestReader.getRequestMethod()) {
-            case "GET":
-              response = responseHandler.readFile();
-              break;
-            case "POST":
-              response = responseHandler.writeFile(requestReader.getBody());
-              break;
-            default:
-              response = responseHandler.generate404();
-          }
-        } else if ("/user-agent".equals(requestReader.getRequestPath())
-            && "GET".equals(requestReader.getRequestMethod()))
-          response = responseHandler.returnUserAgent();
-        else if ("/".equals(requestReader.getRequestPath())
-            && "GET".equals(requestReader.getRequestMethod()))
-          response = responseHandler.generate200WithoutBody();
-        else response = responseHandler.generate404();
+          response = responseHandler.responseWithoutBody(HttpStatus.HTTP_VERSION_NOT_SUPPORTED);
+        switch (requestReader.getRequestMethod()) {
+          case "GET":
+            response = new GetHandler(requestReader).processRequest();
+            break;
+          case "POST":
+            response = new PostHandler(requestReader).processRequest();
+            break;
+          default:
+            response = responseHandler.responseWithoutBody(HttpStatus.NOT_FOUND);
+            break;
+        }
 
+        // write response
         outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
         if (response.getBody().length != 0) outputStream.write(response.getBody());
 
+        // Connection: keep-alive is enabled by default
         keepAlive =
             "keep-alive"
                 .equals(requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"));
+        // clear previous request headers to give way for the next requests
+        requestReader.getRequestHeaders().clear();
       } while (keepAlive);
     } catch (SocketTimeoutException e) {
       System.err.println("SOCKET TIMEOUT!!!");
@@ -83,4 +70,3 @@ public class RequestHandler implements Runnable {
     }
   }
 }
-
