@@ -1,6 +1,7 @@
 package com.gabcytn.server;
 
 import com.gabcytn.App;
+import com.gabcytn.exception.DuplicateUsernameException;
 import com.gabcytn.http.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -129,16 +130,24 @@ public class ResponseHandler {
       if (json.length != 2) throw new Exception("Incorrect JSON format");
       json[0] = json[0].trim().toLowerCase().replaceAll("[{},\", ,\t,\n]", "");
       json[1] = json[1].trim().toLowerCase().replaceAll("[{},\", ,\t,\n]", "");
-      System.err.println("json[0]: " + json[0]);
-      System.err.println("json[1]: " + json[1]);
       if (json[0].startsWith("username:") && json[1].startsWith("password:")) {
         String username = json[0].split(":")[1];
         String password = json[1].split(":")[1];
         boolean successful = App.createUser(username, password);
-        if (!successful) throw new Exception("User already exists");
+        if (!successful) throw new DuplicateUsernameException("User already exists");
         return responseWithoutBody(HttpStatus.CREATED);
       }
       throw new Exception("Incorrect JSON format");
+    } catch (DuplicateUsernameException e) {
+      return new ResponseBuilder()
+          .setHttpStatus(HttpStatus.BAD_REQUEST)
+          .setHeader("Content-Length", Integer.toString(e.getMessage().length()))
+          .setHeader(
+              "Connection",
+              requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
+          .setHeader("Content-Type", "text/plain")
+          .setBody(e.getMessage().getBytes(StandardCharsets.UTF_8))
+          .build();
     } catch (Exception e) {
       System.err.println(e.getMessage());
       return responseWithoutBody(HttpStatus.BAD_REQUEST);
