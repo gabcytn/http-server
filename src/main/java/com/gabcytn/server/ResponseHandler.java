@@ -112,16 +112,7 @@ public class ResponseHandler {
 
   public Response returnUserAgent() {
     String userAgent = requestReader.getRequestHeaders().get("user-agent");
-    return new ResponseBuilder()
-        .setHttpStatus(HttpStatus.OK)
-        .setHeader(
-            "Connection",
-            requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
-        .setHeader("Content-Type", "text/plain")
-        .setHeader(
-            "Content-Length", Integer.toString(userAgent.getBytes(StandardCharsets.UTF_8).length))
-        .setBody(userAgent.getBytes(StandardCharsets.UTF_8))
-        .build();
+    return responseWithBody(HttpStatus.OK, userAgent);
   }
 
   public Response registerUser() {
@@ -140,15 +131,7 @@ public class ResponseHandler {
       }
       throw new Exception("Incorrect JSON format");
     } catch (DuplicateUsernameException e) {
-      return new ResponseBuilder()
-          .setHttpStatus(HttpStatus.BAD_REQUEST)
-          .setHeader("Content-Length", Integer.toString(e.getMessage().length()))
-          .setHeader(
-              "Connection",
-              requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
-          .setHeader("Content-Type", "text/plain")
-          .setBody(e.getMessage().getBytes(StandardCharsets.UTF_8))
-          .build();
+      return responseWithBody(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (Exception e) {
       System.err.println(e.getMessage());
       return responseWithoutBody(HttpStatus.BAD_REQUEST);
@@ -172,16 +155,7 @@ public class ResponseHandler {
 
     if (!App.login(username, password)) return responseWithoutBody(HttpStatus.UNAUTHORIZED);
 
-    return new ResponseBuilder()
-        .setHttpStatus(HttpStatus.OK)
-        .setHeader(
-            "Connection",
-            requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
-        .setHeader("Content-Length", Integer.toString(message.length()))
-        .setHeader(
-            "Content-Type", requestReader.getRequestHeaders().getOrDefault("accept", "text/plain"))
-        .setBody(message.getBytes())
-        .build();
+    return responseWithBody(HttpStatus.OK, message);
   }
 
   public Response responseWithoutBody(HttpStatus httpStatus) {
@@ -191,6 +165,19 @@ public class ResponseHandler {
         .setHeader(
             "Connection",
             requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
+        .build();
+  }
+
+  public Response responseWithBody(HttpStatus httpStatus, String body) {
+    return new ResponseBuilder()
+        .setHttpStatus(httpStatus)
+        .setHeader("Content-Length", Integer.toString(body.getBytes(StandardCharsets.UTF_8).length))
+        .setHeader(
+            "Connection",
+            requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
+        .setHeader(
+            "Content-Type", requestReader.getRequestHeaders().getOrDefault("accept", "text/plain"))
+        .setBody(body.getBytes(StandardCharsets.UTF_8))
         .build();
   }
 }
