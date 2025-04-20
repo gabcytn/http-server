@@ -1,6 +1,6 @@
 # Java HTTP Server
 
-A simple HTTP server built from scratch in Java using `ServerSocket` and `Socket`. This server supports basic HTTP methods, concurrency, and connection keep-alive. It is designed for educational purposes and serves as a foundation for future enhancements.
+A simple HTTP/1.1 server built from scratch in Java using `ServerSocket` and `Socket`. This server supports basic HTTP methods, concurrency, and connection keep-alive. It is designed for educational purposes and serves as a foundation for future enhancements.
 
 ## Features
 
@@ -8,17 +8,25 @@ A simple HTTP server built from scratch in Java using `ServerSocket` and `Socket
 - **Keep-Alive**: Connections are kept alive for 5 seconds before timing out.
 - **GET / HTTP/1.1**: Returns `200 OK` with no body.
 - **GET /echo/{str}**: Returns the string `{str}` as the response body.
-   - **Accept-Encoding: gzip** request header uses gzip to compress `{str}`
-      - returns **Content-Encoding: gzip** in response header
-- **POST /file/{file_name}**: Writes the body of the POST request to a file in the `/files/` directory. Returns `201 CREATED`.
+   - **Accept-Encoding: gzip** request header uses gzip to compress `{str}`.
+      - returns **Content-Encoding: gzip** in response header.
+- **POST /file/{file_name}**: Writes the body of the POST request to a file in the `/files/` directory
+  - returns `201 CREATED`.
 - **GET /file/{file_name}**: Reads the contents of the specified file and returns it as the response body with `200 OK`.
-   - also supports **gzip**
-- **505 HTTP Version Not Supported**: If the HTTP version is not `HTTP/1.1`
-- **404 Not Found**: All other requests return a `404 Not Found` status.
+   - also supports **gzip**.
+   - returns `404 Not Found` when file doesn't exist.
+- **POST /register**: Requires a username and password in JSON body to "register" this user.
+  - returns `201 Created` if user is successfully registered.
+  - returns `400 Bad Request` if username is already taken or if JSON format is incorrect.
+- **GET /basic**: Requires an Authorization of Basic scheme (username and password encoded in Base64).
+  - returns `200 OK` if authentication is successful.
+  - returns `401 Unauthorized` if not.
+- `505 HTTP Version Not Supported`: If the HTTP version is not `HTTP/1.1`.
+- `404 Not Found`: All other requests return a `404 Not Found` status.
 
 ## Future Features
 
-- HTTP Basic Authentication.
+- SSL/TLS
 
 ## How to Run
 
