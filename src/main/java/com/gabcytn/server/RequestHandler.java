@@ -26,41 +26,24 @@ public class RequestHandler implements Runnable {
   @Override
   public void run() {
     try {
-      boolean keepAlive;
       do {
         requestReader.read();
         // break if there's no request to read;
-        if (!requestReader.getHasRequest()) break;
+        if (!requestReader.getHasRequest()) {
+          break;
+        }
         Response response;
-        if (!"HTTP/1.1".equals(requestReader.getHttpVersion()))
+        if (!"HTTP/1.1".equals(requestReader.getHttpVersion())) {
           response = responseHandler.responseWithoutBody(HttpStatus.HTTP_VERSION_NOT_SUPPORTED);
-        switch (requestReader.getRequestMethod()) {
-          case "GET":
-            response = new GetHandler(requestReader).processRequest();
-            break;
-          case "POST":
-            response = new PostHandler(requestReader).processRequest();
-            break;
-          default:
-            response = responseHandler.responseWithoutBody(HttpStatus.NOT_FOUND);
-            break;
+        } else {
+          response = processGetOrPostRequest();
         }
 
-        // write response
-        outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
-        if (response.getBody().length != 0) outputStream.write(response.getBody());
-
-        // Connection: keep-alive is enabled by default
-        keepAlive =
-            "keep-alive"
-                .equals(requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"));
-        // clear previous request headers to give way for the next requests
-        requestReader.getRequestHeaders().clear();
-      } while (keepAlive);
+        writeResponseInOutputStream(response);
+        clearRequestHeaders();
+      } while (isKeepAlive());
     } catch (SocketTimeoutException e) {
       System.err.println("SOCKET TIMEOUT!!!");
-    } catch (IOException e) {
-      System.err.println("IOException in run() method: " + e.getMessage());
     } finally {
       try {
         socket.close();
@@ -68,5 +51,40 @@ public class RequestHandler implements Runnable {
         System.err.println("Failed to close socket: " + e.getMessage());
       }
     }
+  }
+
+  private Response processGetOrPostRequest() {
+    Response response;
+    switch (requestReader.getRequestMethod()) {
+      case "GET":
+        response = new GetHandler(requestReader).processRequest();
+        break;
+      case "POST":
+        response = new PostHandler(requestReader).processRequest();
+        break;
+      default:
+        response = responseHandler.responseWithoutBody(HttpStatus.NOT_FOUND);
+        break;
+    }
+    return response;
+  }
+
+  private void writeResponseInOutputStream(Response response) {
+    try {
+      outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
+      if (response.getBody().length != 0) outputStream.write(response.getBody());
+    } catch (IOException e) {
+      System.err.println("Error writing the response in output stream.");
+      System.err.println("Message: " + e.getMessage());
+    }
+  }
+
+  private boolean isKeepAlive() {
+    return "keep-alive"
+        .equals(requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"));
+  }
+
+  private void clearRequestHeaders() {
+    requestReader.getRequestHeaders().clear();
   }
 }
