@@ -7,6 +7,7 @@ A simple HTTP/1.1 server built from scratch in Java using `ServerSocket` and `So
 - **Concurrency**: Supports multiple concurrent connections using `ExecutorService` with a fixed thread pool of 10 threads.
 - **Keep-Alive**: Connections are kept alive for 5 seconds before timing out.
 - **GET / HTTP/1.1**: Returns `200 OK` with no body.
+- **GET /user-agent**: Returns the user-agent of the client.
 - **GET /echo/{str}**: Returns the string `{str}` as the response body.
    - **Accept-Encoding: gzip** request header uses gzip to compress `{str}`.
       - returns **Content-Encoding: gzip** in response header.
