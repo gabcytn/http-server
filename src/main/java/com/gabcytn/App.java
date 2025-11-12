@@ -3,26 +3,28 @@ package com.gabcytn;
 import com.gabcytn.server.RequestHandler;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class App {
   private static final Map<String, String> USERS = new HashMap<>();
+  private static final Logger LOG = LogManager.getLogger(App.class);
 
   public static void main(String[] args) throws IOException {
     ServerSocket serverSocket = new ServerSocket(8080);
     ExecutorService executorService = Executors.newFixedThreadPool(10);
-    System.out.println("Server is listening at port 8080...");
+    LOG.info("Server is listening at port 8080...");
     while (true) {
       try {
-        Socket socket = serverSocket.accept();
+        var socket = serverSocket.accept();
         Runnable requestHandler = new RequestHandler(socket);
         executorService.submit(requestHandler);
       } catch (IOException e) {
-        System.err.println("IOException: " + e.getMessage());
+        LOG.error("IOException: {}", e.getMessage());
       }
     }
   }

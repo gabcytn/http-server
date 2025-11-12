@@ -3,12 +3,16 @@ package com.gabcytn.server;
 import com.gabcytn.http.HttpStatus;
 import com.gabcytn.http.RequestReader;
 import com.gabcytn.http.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
 public class RequestHandler implements Runnable {
+  private static final Logger LOG = LogManager.getLogger(RequestHandler.class);
   private final Socket socket;
   private final OutputStream outputStream;
   private final RequestReader requestReader;
@@ -43,12 +47,12 @@ public class RequestHandler implements Runnable {
         clearRequestHeaders();
       } while (isKeepAlive());
     } catch (SocketTimeoutException e) {
-      System.err.println("SOCKET TIMEOUT!!!");
+      LOG.error("SOCKET TIMEOUT!!!");
     } finally {
       try {
         socket.close();
       } catch (IOException e) {
-        System.err.println("Failed to close socket: " + e.getMessage());
+        LOG.error("Failed to close socket: {}", e.getMessage());
       }
     }
   }
@@ -74,8 +78,8 @@ public class RequestHandler implements Runnable {
       outputStream.write(response.toString().getBytes(StandardCharsets.UTF_8));
       if (response.getBody().length != 0) outputStream.write(response.getBody());
     } catch (IOException e) {
-      System.err.println("Error writing the response in output stream.");
-      System.err.println("Message: " + e.getMessage());
+      LOG.error("Error writing the response in output stream.");
+      LOG.error("Message: {}", e.getMessage());
     }
   }
 

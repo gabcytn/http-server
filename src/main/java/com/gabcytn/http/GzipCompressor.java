@@ -1,11 +1,15 @@
 package com.gabcytn.http;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
 public class GzipCompressor {
+  private static final Logger LOG = LogManager.getLogger(GzipCompressor.class);
   public GzipCompressor() {}
 
   public byte[] compress(String payload) {
@@ -19,7 +23,7 @@ public class GzipCompressor {
 
       compressedPayload = byteArrayOutputStream.toByteArray();
     } catch (IOException e) {
-      System.err.println("Error compressing with Gzip: " + e.getMessage());
+      LOG.error("Error compressing with Gzip: {}", e.getMessage());
     }
 
     return compressedPayload;

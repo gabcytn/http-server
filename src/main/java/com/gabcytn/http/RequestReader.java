@@ -1,5 +1,8 @@
 package com.gabcytn.http;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RequestReader {
+  private static final Logger LOG = LogManager.getLogger(RequestReader.class);
   private final BufferedReader bufferedReader;
 
   private String requestMethod;
@@ -56,8 +60,8 @@ public class RequestReader {
     } catch (NullPointerException e) {
       this.hasRequest = false;
     } catch (IOException | RuntimeException e) {
-      System.err.println("Error while reading request");
-      System.err.println("\tMessage: " + e.getMessage());
+      LOG.error("Error while reading request");
+      LOG.error("\tMessage: {}", e.getMessage());
       e.printStackTrace();
     }
   }
@@ -70,7 +74,7 @@ public class RequestReader {
       try {
         result = bufferedReader.read(bodyChars, charsRead, contentLength - charsRead);
       } catch (IOException e) {
-        System.err.println("Error reading request body: " + e.getMessage());
+        LOG.error("Error reading request body: {}", e.getMessage());
         result = -1;
       }
       if (result == -1) break;

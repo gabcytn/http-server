@@ -3,11 +3,15 @@ package com.gabcytn.server;
 import com.gabcytn.App;
 import com.gabcytn.exception.DuplicateUsernameException;
 import com.gabcytn.http.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class ResponseHandler {
+  private static final Logger LOG = LogManager.getLogger(ResponseHandler.class);
   private final RequestReader requestReader;
   private static final String FILES_DIR = "files/";
 
@@ -56,7 +60,7 @@ public class ResponseHandler {
               requestReader.getRequestHeaders().getOrDefault("connection", "keep-alive"))
           .build();
     } catch (IOException e) {
-      System.err.println("Error writing file: " + e.getMessage());
+      LOG.error("Error writing file: {}", e.getMessage());
       e.printStackTrace();
       return responseWithoutBody(HttpStatus.NOT_FOUND);
     }
@@ -104,7 +108,7 @@ public class ResponseHandler {
       reader.close();
       return stringBuilder.toString();
     } catch (IOException e) {
-      System.err.println("File not found: " + e.getMessage());
+      LOG.error("File not found: {}", e.getMessage());
       e.printStackTrace();
       return null;
     }
@@ -133,7 +137,7 @@ public class ResponseHandler {
     } catch (DuplicateUsernameException e) {
       return responseWithBody(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (Exception e) {
-      System.err.println(e.getMessage());
+      LOG.error(e.getMessage());
       return responseWithoutBody(HttpStatus.BAD_REQUEST);
     }
   }
