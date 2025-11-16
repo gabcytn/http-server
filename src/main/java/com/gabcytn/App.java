@@ -7,12 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class App {
   private static final Map<String, String> USERS = new HashMap<>();
-  private static final Logger LOG = LogManager.getLogger(App.class);
+  private static final Logger LOG = LoggerFactory.getLogger(App.class);
 
   public static void main(String[] args) throws IOException {
     ServerSocket serverSocket = new ServerSocket(8080);

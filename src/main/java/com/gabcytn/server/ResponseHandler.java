@@ -3,15 +3,15 @@ package com.gabcytn.server;
 import com.gabcytn.App;
 import com.gabcytn.exception.DuplicateUsernameException;
 import com.gabcytn.http.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class ResponseHandler {
-  private static final Logger LOG = LogManager.getLogger(ResponseHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ResponseHandler.class);
   private final RequestReader requestReader;
   private static final String FILES_DIR = "files/";
 

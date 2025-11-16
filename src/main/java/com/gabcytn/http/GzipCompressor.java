@@ -1,7 +1,7 @@
 package com.gabcytn.http;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
 public class GzipCompressor {
-  private static final Logger LOG = LogManager.getLogger(GzipCompressor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GzipCompressor.class);
   public GzipCompressor() {}
 
   public byte[] compress(String payload) {
