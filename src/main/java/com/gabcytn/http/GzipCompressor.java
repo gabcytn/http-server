@@ -8,10 +8,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
-public class GzipCompressor {
+public class GzipCompressor implements Compressor{
   private static final Logger LOG = LoggerFactory.getLogger(GzipCompressor.class);
   public GzipCompressor() {}
 
+  @Override
   public byte[] compress(String payload) {
     byte[] uncompressedPayload = payload.getBytes(StandardCharsets.UTF_8);
     byte[] compressedPayload = new byte[0];

@@ -35,8 +35,8 @@ public class ResponseHandler {
     String acceptEncoding = requestReader.getRequestHeaders().getOrDefault("accept-encoding", "");
     byte[] body;
     if (acceptEncoding.contains("gzip")) {
-      GzipCompressor gzipCompressor = new GzipCompressor();
-      body = gzipCompressor.compress(stringedBody);
+      Compressor compressor = new GzipCompressor();
+      body = compressor.compress(stringedBody);
       responseBuilder.setHeader("Content-Encoding", "gzip");
     } else body = stringedBody.getBytes(StandardCharsets.UTF_8);
 
@@ -86,8 +86,8 @@ public class ResponseHandler {
 
     byte[] body;
     if (requestReader.getRequestHeaders().getOrDefault("accept-encoding", "").contains("gzip")) {
-      GzipCompressor gzipCompressor = new GzipCompressor();
-      body = gzipCompressor.compress(fileContent);
+      Compressor compressor = new GzipCompressor();
+      body = compressor.compress(fileContent);
       builder.setHeader("Content-Encoding", "gzip");
     } else body = fileContent.getBytes(StandardCharsets.UTF_8);
 
