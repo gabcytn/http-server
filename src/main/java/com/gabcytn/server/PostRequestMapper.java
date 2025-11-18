@@ -4,11 +4,11 @@ import com.gabcytn.http.HttpStatus;
 import com.gabcytn.http.RequestReader;
 import com.gabcytn.http.Response;
 
-public class PostHandler {
+public class PostRequestMapper {
   private final RequestReader requestReader;
   private final ResponseHandler responseHandler;
 
-  public PostHandler(RequestReader requestReader) {
+  public PostRequestMapper(RequestReader requestReader) {
     this.requestReader = requestReader;
     this.responseHandler = new ResponseHandler(requestReader);
   }

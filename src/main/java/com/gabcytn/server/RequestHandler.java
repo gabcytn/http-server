@@ -61,10 +61,10 @@ public class RequestHandler implements Runnable {
     Response response;
     switch (requestReader.getRequestMethod()) {
       case "GET":
-        response = new GetHandler(requestReader).processRequest();
+        response = new GetRequestMapper(requestReader).processRequest();
         break;
       case "POST":
-        response = new PostHandler(requestReader).processRequest();
+        response = new PostRequestMapper(requestReader).processRequest();
         break;
       default:
         response = responseHandler.responseWithoutBody(HttpStatus.NOT_FOUND);
