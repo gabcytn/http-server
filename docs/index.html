@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java HTTP Server Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        h2:first-child {
+            margin-top: 0;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+
+        .get {
+            background: #27ae60;
+            color: white;
+        }
+
+        .post {
+            background: #e67e22;
+            color: white;
+        }
+
+        .path {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+
+        .description {
+            margin-top: 10px;
+            color: #555;
+        }
+
+        .response {
+            margin-top: 8px;
+            font-size: 0.9em;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            margin-right: 5px;
+        }
+
+        .status-200 {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-201 {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-400 {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-401 {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-404 {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-505 {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .note strong {
+            color: #856404;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .indent {
+            margin-left: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Java HTTP Server</h1>
+        <p class="subtitle">A lightweight multithreaded HTTP/1.1 server built from scratch</p>
+    </header>
+
+    <div class="content">
+        <h2>Overview</h2>
+        <p>A simple HTTP/1.1 server built in Java using <code>ServerSocket</code> and <code>Socket</code>. This server supports basic HTTP methods, concurrency, and connection keep-alive. Designed for educational purposes and as a foundation for future enhancements.</p>
+
+        <div class="note" style="background: #d1ecf1; border-left-color: #17a2b8;">
+            <strong>Server URL:</strong> The server is available at <a href="http://129.212.224.82:8080/" target="_blank" style="color: #0c5460; font-weight: bold;">http://129.212.224.82:8080/</a>
+        </div>
+
+        <h2>Features</h2>
+        <ul class="feature-list">
+            <li><strong>Concurrency:</strong> Supports multiple concurrent connections using <code>ExecutorService</code> with a fixed thread pool of 10 threads</li>
+            <li><strong>Keep-Alive:</strong> Connections are kept alive for 5 seconds before timing out</li>
+            <li><strong>Compression:</strong> Supports gzip encoding for responses</li>
+            <li><strong>File Operations:</strong> Read and write files in the <code>/files/</code> directory</li>
+            <li><strong>Authentication:</strong> Basic authentication support</li>
+        </ul>
+
+        <h2>API Endpoints</h2>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/</span>
+            </div>
+            <div class="description">Root endpoint</div>
+            <div class="response">
+                <span class="status status-200">200 OK</span> with no body
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/user-agent</span>
+            </div>
+            <div class="description">Returns the user-agent of the client</div>
+            <div class="response">
+                <span class="status status-200">200 OK</span>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/echo/{str}</span>
+            </div>
+            <div class="description">Returns the string <code>{str}</code> as the response body</div>
+            <div class="response">
+                <span class="status status-200">200 OK</span>
+            </div>
+            <div class="indent" style="margin-top: 10px;">
+                <strong>Headers:</strong>
+                <div style="margin-top: 5px;">
+                    <code>Accept-Encoding: gzip</code> - Compresses response using gzip
+                </div>
+                <div style="margin-top: 5px;">
+                    Response includes <code>Content-Encoding: gzip</code> header
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/file/{file_name}</span>
+            </div>
+            <div class="description">Reads the contents of the specified file and returns it as the response body</div>
+            <div class="response">
+                <span class="status status-200">200 OK</span> on success
+            </div>
+            <div class="response">
+                <span class="status status-404">404 Not Found</span> when file doesn't exist
+            </div>
+            <div class="indent" style="margin-top: 10px;">
+                Supports gzip compression
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/file/{file_name}</span>
+            </div>
+            <div class="description">Writes the body of the POST request to a file in the <code>/files/</code> directory</div>
+            <div class="response">
+                <span class="status status-201">201 Created</span>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/register</span>
+            </div>
+            <div class="description">Requires a username and password in JSON body to register a user</div>
+            <div class="response">
+                <span class="status status-201">201 Created</span> if user is successfully registered
+            </div>
+            <div class="response">
+                <span class="status status-400">400 Bad Request</span> if username is already taken or JSON format is incorrect
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/basic</span>
+            </div>
+            <div class="description">Requires an Authorization header with Basic scheme (username and password encoded in Base64)</div>
+            <div class="response">
+                <span class="status status-200">200 OK</span> if authentication is successful
+            </div>
+            <div class="response">
+                <span class="status status-401">401 Unauthorized</span> if authentication fails
+            </div>
+        </div>
+
+        <h2>Error Responses</h2>
+
+        <div class="endpoint">
+            <div class="description">HTTP version is not HTTP/1.1</div>
+            <div class="response">
+                <span class="status status-505">505 HTTP Version Not Supported</span>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="description">All other unmatched requests</div>
+            <div class="response">
+                <span class="status status-404">404 Not Found</span>
+            </div>
+        </div>
+
+        <h2>Future Features</h2>
+        <div class="note">
+            <strong>Coming Soon:</strong> SSL/TLS support for secure connections
+        </div>
+    </div>
+
+    <footer>
+        Built for educational purposes<br/>
+        Inspired from: <a href="https://codecrafters.io" target="_blank">CodeCrafters</a>
+    </footer>
+</div>
+</body>
+</html>
